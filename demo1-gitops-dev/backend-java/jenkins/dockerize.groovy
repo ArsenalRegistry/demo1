@@ -43,26 +43,24 @@ podTemplate(cloud:'kubernetes',label: label, serviceAccount: 'default', namespac
             branchTemp = params.branchName
             branch=getBranchName(branchTemp)
 
-
             stage('Get Source') {
-                git url: "https://gitlab.dspace.kt.co.kr/partnership/partnership-api.git",
-                        credentialsId: 'partnership-git-credentials',
+                git url: "https://github.com/ArsenalRegistry/demo1.git",
+                        credentialsId: 'github-credentials',
                         branch: "${branch}"
                 commitId = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
             }
-            def props = readProperties  file:'devops/jenkins/dockerize.properties'
+
+
+            def props = readProperties  file:'demo1-gitops-dev/backend-java/jenkins/dockerize.properties'
             def tag = commitId
             def dockerRegistry = props['dockerRegistry']
             def image = props['image']
-            def selector = props['selector']
+
             def namespace = props['namespace']
-            def appname = props['appname']
-            def apiKey = props['apiKey']
-            def projectId = props['projectId']
 
 
-            def unitTestEnable = true
-            unitTestEnable = params.unitTestEnable
+            // def unitTestEnable = true
+            // unitTestEnable = params.unitTestEnable
 
             // def mvnSettings = "${env.WORKSPACE}/devops/jenkins/settings.xml"
             // if ( isIpcRunningEnv ) {
@@ -71,35 +69,33 @@ podTemplate(cloud:'kubernetes',label: label, serviceAccount: 'default', namespac
             //     mvnSettings = "${env.WORKSPACE}/devops/jenkins/settings-epc.xml"
             // }
 
-            /*
-            stage("CodePrism RUN") {
-                gl_CodePrismRunMD(apiKey, projectId)
-            }
-            */
+
 
             // def buildScope = params.buildScope
 
-            stage('dspace nexus setting update') {
-                container('build-tools') {
-                    withCredentials([usernamePassword(credentialsId: 'partnership-nexus-credential', usernameVariable: 'nexusUsername', passwordVariable: 'nexusPassword')]) {
-                        sh "export NEXUS_USERNAME=${nexusUsername}"
-                        sh "export NEXUS_PASSWORD=${nexusPassword}"
-                        sh "sed -i 's/\${env.NEXUS_USERNAME}/${nexusUsername}/g' gradle.properties"
-                        sh "sed -i 's/\${env.NEXUS_PASSWORD}/${nexusPassword}/g' gradle.properties"
-                    }
-                }
-            }
+            // stage('dspace nexus setting update') {
+            //     container('build-tools') {
+            //         withCredentials([usernamePassword(credentialsId: 'partnership-nexus-credential', usernameVariable: 'nexusUsername', passwordVariable: 'nexusPassword')]) {
+            //             sh "export NEXUS_USERNAME=${nexusUsername}"
+            //             sh "export NEXUS_PASSWORD=${nexusPassword}"
+            //             sh "sed -i 's/\${env.NEXUS_USERNAME}/${nexusUsername}/g' gradle.properties"
+            //             sh "sed -i 's/\${env.NEXUS_PASSWORD}/${nexusPassword}/g' gradle.properties"
+            //         }
+            //     }
+            // }
 
 
 
             stage('Gradle build &Unit Test') {
                 container('build-tools') {
-                    sh 'gradle build -Dgradle.wrapperUser=${NEXUS_ID} -Dgradle.wrapperPassword=${NEXUS_PASSWORD}' // 프로젝트 빌드
-                    sh 'ls -alh'
-                    sh 'ls ./build/libs -alh'
-
-                    // sh "chmod 755 ./gradlew"
-                    // sh "./gradlew build -Pipc"
+                    dir('backend-java'){
+                        // sh 'gradle build -Dgradle.wrapperUser=${NEXUS_ID} -Dgradle.wrapperPassword=${NEXUS_PASSWORD}' // 프로젝트 빌드
+                        sh 'gradle build' // 프로젝트 빌드
+                        sh 'ls -alh'
+                        sh 'ls ./build/libs -alh'
+                        sleep 100000
+                    }
+ 
 
                 }
             }
