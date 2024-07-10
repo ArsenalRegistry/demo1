@@ -1,4 +1,4 @@
-def label = "Partnership-${UUID.randomUUID().toString()}"
+def label = "demo1-${UUID.randomUUID().toString()}"
 
 def isIpcRunningEnv = true
 def isEpcRunningEnv = false
