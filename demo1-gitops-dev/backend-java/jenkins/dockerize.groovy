@@ -107,7 +107,7 @@ podTemplate(cloud:'kubernetes',label: label, serviceAccount: 'default', namespac
                         // sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${azureTenantId}"
                         sh "az acr login --name ${acrName}"
                         // 이미지 빌드/푸시
-                        sh "docker build -t ${acrName}.azurecr.io/${image}:${tag} --build-arg sourceFile=$(find target -name '*.jar' | head -n 1) -f demo1-gitops-dev/backend-java/jenkins/Dockerfile ."
+                        sh "docker build -t ${acrName}.azurecr.io/${image}:${tag} --build-arg sourceFile=`find target -name '*.jar' | head -n 1` -f demo1-gitops-dev/backend-java/jenkins/Dockerfile . --tls-verify=false"
                         sh "docker push ${acrName}.azurecr.io/${image}:${tag}"
                         sh "docker tag ${acrName}.azurecr.io/${image}:${tag} ${acrName}.azurecr.io/${image}:latest"
                         sh "docker push ${acrName}.azurecr.io/${image}:latest"
