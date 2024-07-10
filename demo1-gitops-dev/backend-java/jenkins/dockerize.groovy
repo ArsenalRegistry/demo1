@@ -14,11 +14,10 @@ String getBranchName(branch) {
 podTemplate(cloud:'c02-okd4-cz-tb',label: label, serviceAccount: 'default', namespace: 'partnership',
         containers: [
             containerTemplate(name: 'build-tools', image: 'ghcr.io/arsenalregistry/build-tools:v3.0', ttyEnabled: true, command: 'cat', privileged: true, alwaysPullImage: true),
-            containerTemplate(name: 'jnlp', image: 'ktis-bastion01.container.ipc.kt.com:5000/jenkins/jnlp-slave:alpine', args: '${computer.jnlpmac} ${computer.name}')
+            containerTemplate(name: 'jnlp', image: 'ghcr.io/arsenalregistry/inbound-agent:latest', args: '${computer.jnlpmac} ${computer.name}')
         ],
         volumes: [
-                hostPathVolume(hostPath: '/etc/mycontainers', mountPath: '/var/lib/containers'),
-                nfsVolume(mountPath: '/home/jenkins', serverAddress: '10.217.166.126', serverPath: '/jenkins-slave-pv', readOnly: false)
+                hostPathVolume(hostPath: '/etc/mycontainers', mountPath: '/var/lib/containers')
         ]
     ) {
 
@@ -32,19 +31,13 @@ podTemplate(cloud:'c02-okd4-cz-tb',label: label, serviceAccount: 'default', name
                     // remove previous working dir
                     print "freshStart... clean working directory ${env.JOB_NAME}"
                     sh 'ls -A1|xargs rm -rf' /* clean up our workspace */
+                    sleep 1000000
                 }
             }
 
-//            stage('Add hosts') {
-//                container('build-tools') {
-//                    sh 'echo "10.217.59.19 ktis-bastion01.container.ipc.kt.com " >> /etc/hosts'
-//                    sh 'echo "10.217.65.62 gitlab.dspace.kt.co.kr" >> /etc/hosts'
-//                }
-//            }
-
-
             def commitId
 
+            
             def branchTemp
             //branch Name Parsing
             branchTemp = params.branchName
