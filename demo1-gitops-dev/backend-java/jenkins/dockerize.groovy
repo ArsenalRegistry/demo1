@@ -101,9 +101,10 @@ podTemplate(cloud:'kubernetes',label: label, serviceAccount: 'default', namespac
 
             stage('Build Docker image') {
                 container('build-tools') {
-                    withCredentials([usernamePassword(credentialsId: 'azure-credential', usernameVariable: 'AZURE_CLIENT_ID', passwordVariable: 'AZURE_CLIENT_SECRET')]) {
+                    withCredentials([usernamePassword(credentialsId: 'azure-credential', usernameVariable: 'AZURE_USERNAME', passwordVariable: 'AZURE_PASSWORD')]) {
                         // 로그인
-                        sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${azureTenantId}"
+                        sh "az login --username ${AZURE_USERNAME} --password ${AZURE_PASSWORD}"
+                        // sh "az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${azureTenantId}"
                         sh "az acr login --name ${acrName}"
                         // 이미지 빌드/푸시
                         sh "docker build -t ${acrName}.azurecr.io/${image}:${tag} --build-arg sourceFile=$(find target -name '*.jar' | head -n 1) -f demo1-gitops-dev/backend-java/jenkins/Dockerfile ."
