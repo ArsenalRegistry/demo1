@@ -11,7 +11,7 @@ String getBranchName(branch) {
     return branchTemp
 }
 
-podTemplate(cloud:'c02-okd4-cz-tb',label: label, serviceAccount: 'default', namespace: 'partnership',
+podTemplate(cloud:'kubernetes',label: label, serviceAccount: 'default', namespace: 'demo1',
         containers: [
             containerTemplate(name: 'build-tools', image: 'ghcr.io/arsenalregistry/build-tools:v3.0', ttyEnabled: true, command: 'cat', privileged: true, alwaysPullImage: true),
             containerTemplate(name: 'jnlp', image: 'ghcr.io/arsenalregistry/inbound-agent:latest', args: '${computer.jnlpmac} ${computer.name}')
