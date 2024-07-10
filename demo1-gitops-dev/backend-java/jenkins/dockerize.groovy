@@ -13,7 +13,7 @@ String getBranchName(branch) {
 
 podTemplate(cloud:'c02-okd4-cz-tb',label: label, serviceAccount: 'default', namespace: 'partnership',
         containers: [
-            containerTemplate(name: 'build-tools', image: 'ktis-bastion01.container.ipc.kt.com:5000/alpine/build-tools:v3.0', ttyEnabled: true, command: 'cat', privileged: true, alwaysPullImage: true),
+            containerTemplate(name: 'build-tools', image: 'ghcr.io/arsenalregistry/build-tools:v3.0', ttyEnabled: true, command: 'cat', privileged: true, alwaysPullImage: true),
             containerTemplate(name: 'jnlp', image: 'ktis-bastion01.container.ipc.kt.com:5000/jenkins/jnlp-slave:alpine', args: '${computer.jnlpmac} ${computer.name}')
         ],
         volumes: [
